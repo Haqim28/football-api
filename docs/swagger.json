@@ -1,0 +1,1548 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Football API - AYO Technical Test 2026",
+    "description": "Backend API untuk manajemen tim sepakbola amatir perusahaan XYZ. Menyediakan CRUD untuk Tim, Pemain, Pertandingan, pencatatan Gol, dan Laporan hasil pertandingan.\n\nSemua endpoint GET bersifat publik. Endpoint POST/PUT/DELETE memerlukan header `X-API-Key` (lihat Authorize di kanan atas).",
+    "version": "1.0",
+    "contact": {}
+  },
+  "host": "localhost:8080",
+  "basePath": "/api/v1",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "X-API-Key",
+      "in": "header",
+      "description": "API Key untuk endpoint yang membutuhkan otorisasi (create/update/delete)."
+    }
+  },
+  "tags": [
+    {
+      "name": "Teams",
+      "description": "Manajemen data tim"
+    },
+    {
+      "name": "Players",
+      "description": "Manajemen data pemain"
+    },
+    {
+      "name": "Matches",
+      "description": "Manajemen jadwal & hasil pertandingan"
+    },
+    {
+      "name": "Reports",
+      "description": "Laporan rekap pertandingan"
+    }
+  ],
+  "paths": {
+    "/teams": {
+      "get": {
+        "summary": "Daftar semua tim",
+        "tags": [
+          "Teams"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TeamListResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Tambah tim baru",
+        "tags": [
+          "Teams"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTeamRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/TeamResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request - validasi gagal",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized - API key tidak valid",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Conflict - nama tim sudah ada",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/teams/{id}": {
+      "get": {
+        "summary": "Detail tim",
+        "tags": [
+          "Teams"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID tim"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TeamResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Update tim",
+        "tags": [
+          "Teams"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID tim"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UpdateTeamRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/TeamResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Conflict - nama tim sudah ada",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Hapus tim (soft delete)",
+        "tags": [
+          "Teams"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID tim"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DeletedResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/players": {
+      "get": {
+        "summary": "Daftar semua pemain",
+        "tags": [
+          "Players"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "team_id",
+            "type": "integer",
+            "description": "Filter pemain berdasarkan tim"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PlayerListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request - team_id tidak valid",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Tambah pemain baru",
+        "tags": [
+          "Players"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreatePlayerRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/PlayerResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request - validasi gagal / posisi tidak valid",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found - tim tidak ditemukan",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Conflict - nomor punggung sudah dipakai di tim ini",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/players/{id}": {
+      "get": {
+        "summary": "Detail pemain",
+        "tags": [
+          "Players"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pemain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PlayerResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Update pemain",
+        "tags": [
+          "Players"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pemain"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UpdatePlayerRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/PlayerResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found - pemain/tim tidak ditemukan",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Conflict - nomor punggung sudah dipakai",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Hapus pemain (soft delete)",
+        "tags": [
+          "Players"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pemain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DeletedResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/matches": {
+      "get": {
+        "summary": "Daftar semua pertandingan",
+        "tags": [
+          "Matches"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MatchListResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Buat jadwal pertandingan",
+        "tags": [
+          "Matches"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateMatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/MatchResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request - tim home dan away sama",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found - tim tidak ditemukan",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/matches/{id}": {
+      "get": {
+        "summary": "Detail pertandingan",
+        "tags": [
+          "Matches"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pertandingan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MatchResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Update jadwal pertandingan",
+        "tags": [
+          "Matches"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pertandingan"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/UpdateMatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MatchResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request - tim home dan away sama",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - pertandingan sudah completed",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Hapus jadwal pertandingan (soft delete)",
+        "tags": [
+          "Matches"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pertandingan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DeletedResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/matches/{id}/result": {
+      "post": {
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Submit hasil pertandingan",
+        "description": "Menyimpan skor akhir dan daftar pencetak gol. Jumlah gol pemain dari tim home harus sama dengan home_score, begitu juga away_score untuk tim away. Pertandingan otomatis berubah status menjadi `completed` setelah hasil disimpan.",
+        "tags": [
+          "Matches"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pertandingan"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SubmitResultRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/GoalListResponse"
+            }
+          },
+          "400": {
+            "description": "Bad Request - pemain bukan dari tim yang bertanding / jumlah gol tidak sesuai skor",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found - pertandingan tidak ditemukan",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity - pertandingan sudah selesai",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/reports": {
+      "get": {
+        "summary": "Laporan semua pertandingan",
+        "tags": [
+          "Reports"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MatchReportListResponse"
+            }
+          }
+        }
+      }
+    },
+    "/reports/matches/{id}": {
+      "get": {
+        "summary": "Laporan detail per pertandingan",
+        "description": "Menampilkan jadwal, skor, status akhir (Tim Home Menang/Tim Away Menang/Draw/Belum Selesai), top scorer, serta akumulasi total kemenangan tim home & away sampai dengan pertandingan ini.",
+        "tags": [
+          "Reports"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "ID pertandingan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MatchReportSingleResponse"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Team": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Persib Bandung"
+        },
+        "logo": {
+          "type": "string",
+          "example": "https://example.com/logo.png"
+        },
+        "founded": {
+          "type": "integer",
+          "example": 1933
+        },
+        "headquarters_address": {
+          "type": "string",
+          "example": "Jl. Sulanjana No.17"
+        },
+        "headquarters_city": {
+          "type": "string",
+          "example": "Bandung"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Player": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 3
+        },
+        "team_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "team": {
+          "$ref": "#/definitions/Team"
+        },
+        "name": {
+          "type": "string",
+          "example": "Achmad Jufriyanto"
+        },
+        "height": {
+          "type": "number",
+          "example": 178
+        },
+        "weight": {
+          "type": "number",
+          "example": 72
+        },
+        "position": {
+          "type": "string",
+          "enum": [
+            "penyerang",
+            "gelandang",
+            "bertahan",
+            "penjaga_gawang"
+          ],
+          "example": "bertahan"
+        },
+        "jersey_number": {
+          "type": "integer",
+          "example": 5
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Goal": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "match_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "player_id": {
+          "type": "integer",
+          "example": 3
+        },
+        "team_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "minute": {
+          "type": "integer",
+          "example": 23
+        },
+        "player": {
+          "$ref": "#/definitions/Player"
+        },
+        "team": {
+          "$ref": "#/definitions/Team"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Match": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "match_date": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2026-07-15T15:00:00Z"
+        },
+        "home_team_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "away_team_id": {
+          "type": "integer",
+          "example": 2
+        },
+        "home_team": {
+          "$ref": "#/definitions/Team"
+        },
+        "away_team": {
+          "$ref": "#/definitions/Team"
+        },
+        "home_score": {
+          "type": "integer",
+          "example": 2
+        },
+        "away_score": {
+          "type": "integer",
+          "example": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "completed"
+          ],
+          "example": "scheduled"
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Goal"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "CreateTeamRequest": {
+      "type": "object",
+      "required": [
+        "name",
+        "founded",
+        "headquarters_address",
+        "headquarters_city"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "example": "Persib Bandung"
+        },
+        "logo": {
+          "type": "string",
+          "example": "https://example.com/logo.png"
+        },
+        "founded": {
+          "type": "integer",
+          "minimum": 1800,
+          "maximum": 2100,
+          "example": 1933
+        },
+        "headquarters_address": {
+          "type": "string",
+          "example": "Jl. Sulanjana No.17"
+        },
+        "headquarters_city": {
+          "type": "string",
+          "example": "Bandung"
+        }
+      }
+    },
+    "UpdateTeamRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "logo": {
+          "type": "string"
+        },
+        "founded": {
+          "type": "integer",
+          "minimum": 1800,
+          "maximum": 2100
+        },
+        "headquarters_address": {
+          "type": "string"
+        },
+        "headquarters_city": {
+          "type": "string"
+        }
+      }
+    },
+    "CreatePlayerRequest": {
+      "type": "object",
+      "required": [
+        "team_id",
+        "name",
+        "height",
+        "weight",
+        "position",
+        "jersey_number"
+      ],
+      "properties": {
+        "team_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "example": "Achmad Jufriyanto"
+        },
+        "height": {
+          "type": "number",
+          "example": 178,
+          "description": "Tinggi badan dalam cm"
+        },
+        "weight": {
+          "type": "number",
+          "example": 72,
+          "description": "Berat badan dalam kg"
+        },
+        "position": {
+          "type": "string",
+          "enum": [
+            "penyerang",
+            "gelandang",
+            "bertahan",
+            "penjaga_gawang"
+          ],
+          "example": "bertahan"
+        },
+        "jersey_number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99,
+          "example": 5
+        }
+      }
+    },
+    "UpdatePlayerRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "height": {
+          "type": "number"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "position": {
+          "type": "string",
+          "enum": [
+            "penyerang",
+            "gelandang",
+            "bertahan",
+            "penjaga_gawang"
+          ]
+        },
+        "jersey_number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "team_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "CreateMatchRequest": {
+      "type": "object",
+      "required": [
+        "match_date",
+        "home_team_id",
+        "away_team_id"
+      ],
+      "properties": {
+        "match_date": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2026-07-15T15:00:00Z"
+        },
+        "home_team_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "away_team_id": {
+          "type": "integer",
+          "example": 2
+        }
+      }
+    },
+    "UpdateMatchRequest": {
+      "type": "object",
+      "properties": {
+        "match_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "home_team_id": {
+          "type": "integer"
+        },
+        "away_team_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "GoalRequest": {
+      "type": "object",
+      "required": [
+        "player_id",
+        "minute"
+      ],
+      "properties": {
+        "player_id": {
+          "type": "integer",
+          "example": 3
+        },
+        "minute": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120,
+          "example": 23
+        }
+      }
+    },
+    "SubmitResultRequest": {
+      "type": "object",
+      "required": [
+        "home_score",
+        "away_score",
+        "goals"
+      ],
+      "properties": {
+        "home_score": {
+          "type": "integer",
+          "minimum": 0,
+          "example": 2
+        },
+        "away_score": {
+          "type": "integer",
+          "minimum": 0,
+          "example": 1
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GoalRequest"
+          }
+        }
+      }
+    },
+    "TeamInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "Persib Bandung"
+        },
+        "logo": {
+          "type": "string"
+        }
+      }
+    },
+    "TopScorer": {
+      "type": "object",
+      "properties": {
+        "player_id": {
+          "type": "integer",
+          "example": 3
+        },
+        "name": {
+          "type": "string",
+          "example": "Achmad Jufriyanto"
+        },
+        "team_name": {
+          "type": "string",
+          "example": "Persib Bandung"
+        },
+        "goals": {
+          "type": "integer",
+          "example": 2
+        }
+      }
+    },
+    "GoalInfo": {
+      "type": "object",
+      "properties": {
+        "player_id": {
+          "type": "integer",
+          "example": 3
+        },
+        "player_name": {
+          "type": "string",
+          "example": "Achmad Jufriyanto"
+        },
+        "team_name": {
+          "type": "string",
+          "example": "Persib Bandung"
+        },
+        "minute": {
+          "type": "integer",
+          "example": 23
+        }
+      }
+    },
+    "MatchReportResponse": {
+      "type": "object",
+      "properties": {
+        "match_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "match_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "home_team": {
+          "$ref": "#/definitions/TeamInfo"
+        },
+        "away_team": {
+          "$ref": "#/definitions/TeamInfo"
+        },
+        "home_score": {
+          "type": "integer",
+          "example": 2
+        },
+        "away_score": {
+          "type": "integer",
+          "example": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "scheduled",
+            "completed"
+          ]
+        },
+        "match_result": {
+          "type": "string",
+          "enum": [
+            "Tim Home Menang",
+            "Tim Away Menang",
+            "Draw",
+            "Belum Selesai"
+          ]
+        },
+        "top_scorer": {
+          "$ref": "#/definitions/TopScorer"
+        },
+        "home_team_total_wins": {
+          "type": "integer",
+          "example": 5
+        },
+        "away_team_total_wins": {
+          "type": "integer",
+          "example": 3
+        },
+        "goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GoalInfo"
+          }
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "message": {
+          "type": "string",
+          "example": "request failed"
+        },
+        "error": {
+          "type": "string",
+          "example": "terjadi kesalahan"
+        }
+      }
+    },
+    "TeamResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "$ref": "#/definitions/Team"
+        }
+      }
+    },
+    "TeamListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Team"
+          }
+        }
+      }
+    },
+    "PlayerResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "$ref": "#/definitions/Player"
+        }
+      }
+    },
+    "PlayerListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Player"
+          }
+        }
+      }
+    },
+    "MatchResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "$ref": "#/definitions/Match"
+        }
+      }
+    },
+    "MatchListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Match"
+          }
+        }
+      }
+    },
+    "GoalListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Goal"
+          }
+        }
+      }
+    },
+    "MatchReportSingleResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "$ref": "#/definitions/MatchReportResponse"
+        }
+      }
+    },
+    "MatchReportListResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MatchReportResponse"
+          }
+        }
+      }
+    },
+    "DeletedResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "message": {
+          "type": "string",
+          "example": "OK"
+        }
+      }
+    }
+  }
+}
