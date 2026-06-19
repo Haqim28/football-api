@@ -1558,7 +1558,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
 	Title:            "Football API - AYO Technical Test 2026",
-	Description:      "Backend API untuk manajemen tim sepakbola amatir perusahaan XYZ. Menyediakan CRUD untuk Tim, Pemain, Pertandingan, pencatatan Gol, dan Laporan hasil pertandingan.\n\nSemua endpoint GET bersifat publik. Endpoint POST/PUT/DELETE memerlukan header `+"`X-API-Key`"+` (lihat Authorize di kanan atas).",
+	Description:      "Backend API untuk manajemen tim sepakbola amatir perusahaan XYZ. Menyediakan CRUD untuk Tim, Pemain, Pertandingan, pencatatan Gol, dan Laporan hasil pertandingan.\n\nSemua endpoint GET bersifat publik. Endpoint POST/PUT/DELETE memerlukan header `X-API-Key` (lihat Authorize di kanan atas).",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
